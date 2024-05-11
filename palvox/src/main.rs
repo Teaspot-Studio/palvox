@@ -1,4 +1,4 @@
-mod render;
+mod pipeline;
 mod input; 
 
 use glfw::{
@@ -8,7 +8,7 @@ use log;
 use luminance_glfw::{GlfwSurface, GlfwSurfaceError};
 use std::time::Instant;
 use input::{LoopFeedback, adapt_events};
-use render::Pipeline;
+use pipeline::{Pipeline, triangle::TrianglePipeline, quad::QuadPipeline};
 
 #[derive(Debug)]
 pub enum PlatformError {
@@ -40,7 +40,7 @@ fn main() {
 
     let (fb_w, fb_h) = window.get_framebuffer_size();
 
-    let mut pipeline = match Pipeline::bootstrap([fb_w as _, fb_h as _], &mut ctx) {
+    let mut pipeline = match QuadPipeline::bootstrap([fb_w as _, fb_h as _], &mut ctx) {
         Ok(pipeline) => pipeline,
         Err(e) => {
             log::error!("cannot bootstrap pipeline: {}", e);

@@ -14,10 +14,11 @@ use luminance::{
   RenderSlots, Vertex,
 };
 use crate::input::{InputAction, LoopFeedback};
+use super::Pipeline;
 
 // We get the shader at compile time from local files
-const VS: &'static str = include_str!("shaders/simple.vs");
-const FS: &'static str = include_str!("shaders/simple.fs");
+const VS: &'static str = include_str!("../shaders/simple.vs");
+const FS: &'static str = include_str!("../shaders/simple.fs");
 
 // Vertex namespace.
 //
@@ -113,18 +114,20 @@ pub struct Slots {
 }
 
 /// Local example; this will be picked by the example runner.
-pub struct Pipeline {
+pub struct TrianglePipeline {
   back_buffer: Framebuffer<Dim2, Back<Slots>, Back<()>>,
   // the program will render by mapping our Vertex type as triangles to the color slot, containing a single color
   program: Program<Vertex, (), Triangle, Slots, ()>,
   triangles: VertexEntity<Vertex, Triangle, Interleaving>,
 }
 
-impl Pipeline {
-  pub fn bootstrap(
+impl Pipeline for TrianglePipeline {
+  type Error = Error;
+  
+  fn bootstrap(
     [width, height]: [u32; 2],
     context: &mut Context<impl Backend>,
-  ) -> Result<Self, Error> {
+  ) -> Result<Self, Self::Error> {
     // We need a program to “shade” our triangles
     let program = context
       .new_program(
@@ -148,12 +151,12 @@ impl Pipeline {
     })
   }
 
-  pub fn render_frame(
+  fn render_frame(
     self,
     _time_ms: f32,
     actions: impl Iterator<Item = InputAction>,
     context: &mut Context<impl Backend>,
-  ) -> Result<LoopFeedback<Self>, Error> {
+  ) -> Result<LoopFeedback<Self>, Self::Error> {
     for action in actions {
       match action {
         InputAction::Quit => return Ok(LoopFeedback::Exit),
