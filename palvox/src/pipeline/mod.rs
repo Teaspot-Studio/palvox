@@ -7,13 +7,15 @@ use luminance::pixel::NormRGB8UI;
 use luminance::{context::Context, RenderSlots};
 use luminance::backend::Backend;
 
+use crate::assets::AssetLoader;
 use crate::input::{InputAction, LoopFeedback};
 
 pub trait Pipeline: Sized {
   type Error: Display; 
 
-  fn bootstrap(
+  fn bootstrap<A: AssetLoader>(
     frame_size: [u32; 2],
+    assets: &A,
     context: &mut Context<impl Backend>,
   ) -> Result<Self, Self::Error>;
 

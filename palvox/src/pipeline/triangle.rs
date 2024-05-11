@@ -13,7 +13,7 @@ use luminance::{
   vertex_storage::{Interleaved, Interleaving},
   RenderSlots, Vertex,
 };
-use crate::input::{InputAction, LoopFeedback};
+use crate::{assets::AssetLoader, input::{InputAction, LoopFeedback}};
 use super::Pipeline;
 
 // We get the shader at compile time from local files
@@ -123,9 +123,10 @@ pub struct TrianglePipeline {
 
 impl Pipeline for TrianglePipeline {
   type Error = Error;
-  
-  fn bootstrap(
+
+  fn bootstrap<A: AssetLoader>(
     [width, height]: [u32; 2],
+    _assets: &A,
     context: &mut Context<impl Backend>,
   ) -> Result<Self, Self::Error> {
     // We need a program to “shade” our triangles

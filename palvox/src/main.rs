@@ -1,14 +1,14 @@
+mod assets;
+mod input;
 mod pipeline;
-mod input; 
 
-use glfw::{
-    Context as _, SwapInterval, WindowMode,
-};
+use assets::PreloadedImages;
+use glfw::{Context as _, SwapInterval, WindowMode};
+use input::{adapt_events, LoopFeedback};
 use log;
 use luminance_glfw::{GlfwSurface, GlfwSurfaceError};
+use pipeline::{quad::QuadPipeline, triangle::TrianglePipeline, Pipeline};
 use std::time::Instant;
-use input::{LoopFeedback, adapt_events};
-use pipeline::{Pipeline, triangle::TrianglePipeline, quad::QuadPipeline};
 
 #[derive(Debug)]
 pub enum PlatformError {
@@ -40,7 +40,12 @@ fn main() {
 
     let (fb_w, fb_h) = window.get_framebuffer_size();
 
-    let mut pipeline = match QuadPipeline::bootstrap([fb_w as _, fb_h as _], &mut ctx) {
+    let mut assets = PreloadedImages::new();
+    assets
+        .load_file("test", "assets/test.png")
+        .expect("loaded texture");
+
+    let mut pipeline = match QuadPipeline::bootstrap([fb_w as _, fb_h as _], &assets, &mut ctx) {
         Ok(pipeline) => pipeline,
         Err(e) => {
             log::error!("cannot bootstrap pipeline: {}", e);
